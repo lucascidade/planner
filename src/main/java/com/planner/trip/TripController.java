@@ -1,9 +1,6 @@
 package com.planner.trip;
 
-import com.planner.participant.Participant;
-import com.planner.participant.ParticipantCreateResponse;
-import com.planner.participant.ParticipantRequestPayload;
-import com.planner.participant.ParticipantService;
+import com.planner.participant.*;
 import jdk.javadoc.doclet.Reporter;
 import lombok.Getter;
 import org.apache.catalina.connector.Response;
@@ -89,8 +86,8 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}/participants")
-    public ResponseEntity<List<Participant>> getAllParticipants(@PathVariable UUID tripId){
-        List<Participant> participants = this.service.getAllParticipantsFromEvents(tripId);
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID tripId){
+        List<ParticipantData> participants = this.service.getAllParticipantsFromEvents(tripId);
         return ResponseEntity.ok(participants);
 
     }
