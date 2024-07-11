@@ -12,10 +12,23 @@ public class ParticipantService {
 
     @Autowired
     private  ParticipantRepository participantRepository;
-    public void registerParticipantToEvent(List<String> participantsToInvite, Trip trip){
+    public void registerParticipantToEvents(List<String> participantsToInvite, Trip trip){
         List<Participant> participants = participantsToInvite.stream().map(email -> new Participant(email, trip)).toList();
         participantRepository.saveAll(participants);
         System.out.println(participants.get(0).getId());
     }
     public void triggerConfirmationEmaiLToParticipant(UUID tripId){}
+
+    public void triggerConfirmationEmaiLToParticipants(String email){}
+
+    public ParticipantCreateResponse registerParticipantToEvent(String email, Trip tip){
+        Participant participant = new Participant(email, tip);
+        this.participantRepository.save(participant);
+
+        return new ParticipantCreateResponse(participant.getId());
+    }
+
+    public List<Participant> getAllParticipantsFromEvents(UUID tripId){
+        return this.participantRepository.findByTripId(tripId);
+    }
 }

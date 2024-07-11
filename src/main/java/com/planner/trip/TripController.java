@@ -1,5 +1,8 @@
 package com.planner.trip;
 
+import com.planner.participant.Participant;
+import com.planner.participant.ParticipantCreateResponse;
+import com.planner.participant.ParticipantRequestPayload;
 import com.planner.participant.ParticipantService;
 import jdk.javadoc.doclet.Reporter;
 import lombok.Getter;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,7 +32,7 @@ public class TripController {
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
         Trip newTrip = new Trip(payload);
         this.repository.save(newTrip);
-        this.service.registerParticipantToEvent(payload.emails_to_invite(), newTrip);
+        this.service.registerParticipantToEvents(payload.emails_to_invite(), newTrip);
         return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
     }
 
@@ -68,6 +73,26 @@ public class TripController {
             return ResponseEntity.ok(tripToConfirm);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
+        Optional<Trip> trip = repository.findById(id);
+        if(trip.isPresent()) {
+            Trip rawTrip = trip.get();
+            ParticipantCreateResponse response = this.service.registerParticipantToEvent(payload.email(), rawTrip);
+            if(rawTrip.getIsConfirmed()) this.service.triggerConfirmationEmaiLToParticipants(payload.email());
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.notFound().build();
+
+    }
+
+    @GetMapping("/{tripId}/participants")
+    public ResponseEntity<List<Participant>> getAllParticipants(@PathVariable UUID tripId){
+        List<Participant> participants = this.service.getAllParticipantsFromEvents(tripId);
+        return ResponseEntity.ok(participants);
+
     }
 
 
