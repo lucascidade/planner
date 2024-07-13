@@ -1,8 +1,6 @@
 package com.planner.trip;
 
-import com.planner.activities.ActivityRequestPayload;
-import com.planner.activities.ActivityResponse;
-import com.planner.activities.ActivityService;
+import com.planner.activities.*;
 import com.planner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -89,9 +87,15 @@ public class TripController {
 
     }
 
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id){
+        List<ActivityData> activityData = this.activityService.getAllActivities(id);
+        return ResponseEntity.ok(activityData);
+    }
+
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
-        Optional<Trip> trip = repository.findById(id);
+        Optional<Trip> trip = this.repository.findById(id);
         if(trip.isPresent()) {
             Trip rawTrip = trip.get();
             ParticipantCreateResponse response = this.service.registerParticipantToEvent(payload.email(), rawTrip);
@@ -108,6 +112,7 @@ public class TripController {
         return ResponseEntity.ok(participants);
 
     }
+
 
 
 
