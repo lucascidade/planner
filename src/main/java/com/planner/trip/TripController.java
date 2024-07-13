@@ -1,16 +1,15 @@
 package com.planner.trip;
 
+import com.planner.activities.ActivityRequestPayload;
+import com.planner.activities.ActivityResponse;
+import com.planner.activities.ActivityService;
 import com.planner.participant.*;
-import jdk.javadoc.doclet.Reporter;
-import lombok.Getter;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +18,8 @@ import java.util.UUID;
 @RequestMapping("/trips")
 public class TripController {
 
+    @Autowired
+    private ActivityService activityService;
     @Autowired
     private ParticipantService service;
 
@@ -70,6 +71,22 @@ public class TripController {
             return ResponseEntity.ok(tripToConfirm);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
+
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            ActivityResponse activityResponse = this.activityService.saveActivity(payload, rawTrip);
+
+            return ResponseEntity.ok(activityResponse);
+        }
+        return ResponseEntity.notFound().build();
+
     }
 
     @PostMapping("/{id}/invite")
