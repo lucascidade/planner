@@ -1,4 +1,4 @@
 package com.planner.link;
 
-public record LinkRequestPayload(String title, String URL) {
+public record LinkRequestPayload(String title, String url) {
 }

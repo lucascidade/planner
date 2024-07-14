@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "link")
+@Table(name = "links")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,9 +1,7 @@
 package com.planner.trip;
 
 import com.planner.activity.*;
-import com.planner.link.LinkRequestPayload;
-import com.planner.link.LinkResponse;
-import com.planner.link.LinkService;
+import com.planner.link.*;
 import com.planner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -124,15 +122,22 @@ public class TripController {
 
     //LINK
 
-    @PostMapping("/{id}/link")
-    public ResponseEntity<LinkResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
-        Optional<Trip> trip = this.repository.findById(id);
+    @PostMapping("/{tripId}/link")
+    public ResponseEntity<LinkResponse> registerLink(@PathVariable UUID tripId, @RequestBody LinkRequestPayload payload) {
+        Optional<Trip> trip = this.repository.findById(tripId);
         if(trip.isPresent()){
             Trip rawTrip = trip.get();
-            LinkResponse linkResponse = this.linkService.regiterLink(payload, rawTrip);
+            LinkResponse linkResponse = this.linkService.registerLink(payload, rawTrip);
             return ResponseEntity.ok(linkResponse);
         }
         return ResponseEntity.notFound().build();
+
+    }
+
+    @GetMapping("{tripId}/links")
+    public ResponseEntity<List<LinkData>> getAllLinksFromTrip (@PathVariable UUID tripId){
+        List<LinkData> links = this.linkService.getAllLinksFromActivity(tripId);
+        return ResponseEntity.ok(links);
 
     }
 
